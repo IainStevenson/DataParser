@@ -10,8 +10,7 @@
 *.userosscache
 *.sln.docstates
 *.txt
-analysis.json
-data.json
+datassource.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -344,3 +343,4 @@ healthchecksdb
 /src/Identity/identity-log.txt
 /src/Proxy/certificates
 old-analysis.json
+datasource.json

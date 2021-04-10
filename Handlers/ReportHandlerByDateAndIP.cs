@@ -48,7 +48,6 @@ namespace DataParser
             }
 
             response.Append($"\nAnalysis Report: ");
-            response.Append($"\nFound {analysis.Files.Count()} distinct files");
             response.Append($"\nFound {analysis.Summaries.Keys.Count()} distinct ip addresses");
 
             StringBuilder report = new StringBuilder();
