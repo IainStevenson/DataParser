@@ -13,9 +13,6 @@ namespace DataParser
 
         public decimal Jitter { get; set;}
         public decimal Latency { get; set;}
-        public string ISP { get; set;}
-        
-        
+        public string ISP { get; set;}        
     }
-
 }

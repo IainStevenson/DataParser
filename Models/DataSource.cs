@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-
 namespace DataParser
 {
     public class DataSource
@@ -19,6 +17,4 @@ namespace DataParser
         public List<Data> Items { get; set; } = new List< Data>();
 
     }
-
-
 }
