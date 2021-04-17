@@ -12,6 +12,9 @@ namespace DataParser
         public StringBuilder Report(Analysis analysis)
         {
             StringBuilder response = new StringBuilder();
+
+
+
             var reportItems = new List<ReportByHistogram>();
             Console.WriteLine("Reporting Histogram");
 
@@ -21,12 +24,12 @@ namespace DataParser
             {
                 var summaries = analysis.Summaries[index];
 
-                foreach (var data in summaries.OrderBy(x=>x.Timestamp))
+                foreach (var data in summaries.OrderBy(x => x.Timestamp))
                 {
                     var reportItem = new ReportByHistogram();
                     reportItem.Timestamp = data.Timestamp;
-                    reportItem.Down = data.BandwidthDown/125000m;
-                    reportItem.Up = data.BandwidthUp /125000m;
+                    reportItem.Down = data.BandwidthDown / 125000m;
+                    reportItem.Up = data.BandwidthUp / 125000m;
                     reportItem.ISP = data.ISP;
                     reportItem.Jitter = data.Jitter;
                     reportItem.Latency = data.Latency;
@@ -40,7 +43,8 @@ namespace DataParser
 
 
             response.Append($"\nAnalysis Report: ");
-            
+            response.Append($"\n\nTotals: Min Down {analysis.Totals.MinDown / 125000m,-6:00.00} Max Down {analysis.Totals.MaxDown / 125000m,-6:00.00} Min Up {analysis.Totals.MinUp / 125000m,-6:00.00} Max Up {analysis.Totals.MaxUp / 125000m,-6:00.00}\n");
+
             report.Append($"\n{"Time",-21}\t");
             report.Append($"{"Down",-6}\t");
             report.Append($"{"Up",-6}\t");

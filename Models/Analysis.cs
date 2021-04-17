@@ -10,8 +10,6 @@ namespace DataParser
         /// </summary>
         /// <returns></returns>
         public Dictionary<string, List<Summary>> Summaries { get; set; } = new Dictionary<string, List<Summary>>();
-
+        public Totals Totals { get;set;} = new Totals ();
     }
-
-
 }

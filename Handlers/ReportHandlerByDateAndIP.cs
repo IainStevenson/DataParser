@@ -49,18 +49,23 @@ namespace DataParser
 
             response.Append($"\nAnalysis Report: ");
             response.Append($"\nFound {analysis.Summaries.Keys.Count()} distinct ip addresses");
+            response.Append($"\n\nTotals: Min Down {(analysis.Totals.MinDown / 125000m),-6:00.00} ");
+            response.Append($"Max Down {(analysis.Totals.MaxDown / 125000m),-6:00.00} ");
+            response.Append($"Min Up {(analysis.Totals.MinUp / 125000m),-6:00.00}  ");
+            response.Append($"Max Up {(analysis.Totals.MaxUp / 125000m),-6:00.00}\n");
+
 
             StringBuilder report = new StringBuilder();
-            report.Append($"\n                                                                                Mbit/s");
+            report.Append($"\n                                                                Mbit/s");
             response.Append(report);
             report.Clear();
-            report.Append($"\n                                                                                Down                            Up                         ");
+            report.Append($"\n                                                                Down                            Up                         ");
             response.Append(report);
             report.Clear();
-            report.Append($"\n                                                                                ----------------------------    ----------------------------");
+            report.Append($"\n                                                                ----------------------------    ----------------------------");
             response.Append(report);
             report.Clear();
-            report.Append($"\n{"Date",-12}\t{"Address",-15}\t{"From",-22}\t{"To",-22}\t");
+            report.Append($"\n{"Date",-10}\t{"Address",-15}\t{"From",-8}\t{"To",-8}\t");
             report.Append($"Min   \tAvg   \tMax   \tLast \t");
             report.Append($"Min   \tAvg   \tMax   \tLast\t");
             report.Append($"Entries");
@@ -73,19 +78,19 @@ namespace DataParser
             {
                 report.Clear();
 
-                report.Append($"\n{ reportItem.Date,-12:yyyy-MM-dd}\t");
+                report.Append($"\n{ reportItem.Date,-10:yyyy-MM-dd}\t");
                 report.Append($"{ reportItem.ExternalIp,-15}\t");
-                report.Append($"{ reportItem.From,-22:yyyy-MM-dd HH:mm:ss}\t");
-                report.Append($"{ reportItem.To,-22:yyyy-MM-dd HH:mm:ss}\t");
-                report.Append($"{ reportItem.MinDown,-6:00.00}\t");
-                report.Append($"{ reportItem.AvgDown,-6:00.00}\t");
-                report.Append($"{ reportItem.MaxDown,-6:00.00}\t");
-                report.Append($"{ reportItem.LastDown,-6:00.00}\t");
-                report.Append($"{ reportItem.MinUp,-6:00.00}\t");
-                report.Append($"{ reportItem.AvgUp,-6:00.00}\t");
-                report.Append($"{ reportItem.MaxUp,-6:00.00}\t");
-                report.Append($"{ reportItem.LastUp,-6:00.00}\t");
-                report.Append($"{ reportItem.Entries,6:000}");
+                report.Append($"{ reportItem.From,-8:HH:mm:ss}\t");
+                report.Append($"{ reportItem.To,-8:HH:mm:ss}\t");
+                report.Append($"{ reportItem.MinDown,-6:#00.00}\t");
+                report.Append($"{ reportItem.AvgDown,-6:#00.00}\t");
+                report.Append($"{ reportItem.MaxDown,-6:#00.00}\t");
+                report.Append($"{ reportItem.LastDown,-6:#00.00}\t");
+                report.Append($"{ reportItem.MinUp,-6:#00.00}\t");
+                report.Append($"{ reportItem.AvgUp,-6:#00.00}\t");
+                report.Append($"{ reportItem.MaxUp,-6:#00.00}\t");
+                report.Append($"{ reportItem.LastUp,-6:#00.00}\t");
+                report.Append($"{ reportItem.Entries,-6:000}");
 
                 response.Append(report);
 
