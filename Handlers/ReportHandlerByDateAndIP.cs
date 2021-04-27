@@ -14,6 +14,8 @@ namespace DataParser
             StringBuilder response = new StringBuilder();
             var reportItems = new List<ReportByDateAndIP>();
 
+            // cycle through the summaries and process the report items
+
             foreach (var index in analysis.Summaries.Keys.OrderBy(x => x))
             {
                 var reportItem = new ReportByDateAndIP();
@@ -40,8 +42,12 @@ namespace DataParser
                 reportItem.AvgUp = summary.Average(x => x.BandwidthUp) / 125000;
                 reportItem.MaxUp = summary.Max(x => x.BandwidthUp) / 125000m;
 
-                reportItem.LastUp = (summary.LastOrDefault()?.BandwidthUp ?? 1) / 125000m;
-                reportItem.LastDown = (summary.LastOrDefault()?.BandwidthDown ?? 1) / 125000m;
+                reportItem.GBDown = summary.Sum(x => x.BytesDown) / 1073741824m;
+                reportItem.GbUp = summary.Sum(x => x.BytesUp) / 1073741824m;
+
+
+                reportItem.LastUp = (summary.LastOrDefault()?.BandwidthUp ?? 1) / (125000m);
+                reportItem.LastDown = (summary.LastOrDefault()?.BandwidthDown ?? 1) / (125000m);
 
                 reportItems.Add(reportItem);
 
@@ -68,7 +74,8 @@ namespace DataParser
             report.Append($"\n{"Date",-10}\t{"Address",-15}\t{"From",-8}\t{"To",-8}\t");
             report.Append($"Min   \tAvg   \tMax   \tLast \t");
             report.Append($"Min   \tAvg   \tMax   \tLast\t");
-            report.Append($"Entries");
+            report.Append($"Entries\t");
+            report.Append($"GB v\tGB ^");
             response.Append(report);
             report.Clear();
             report.Append($"\n-------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -90,7 +97,10 @@ namespace DataParser
                 report.Append($"{ reportItem.AvgUp,-6:#00.00}\t");
                 report.Append($"{ reportItem.MaxUp,-6:#00.00}\t");
                 report.Append($"{ reportItem.LastUp,-6:#00.00}\t");
-                report.Append($"{ reportItem.Entries,-6:000}");
+                report.Append($"{ reportItem.Entries,-6:000}\t");
+                report.Append($"{ reportItem.GBDown,-6:#00.00}\t");
+                report.Append($"{ reportItem.GbUp,-6:#00.00}");
+
 
                 response.Append(report);
 

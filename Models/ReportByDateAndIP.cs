@@ -17,6 +17,11 @@ namespace DataParser
         public decimal LastUp { get; set; }
         public decimal LastDown { get; set; }
         public DateTime Date { get; set; }
+
+        public decimal GBDown { get;set;}
+        public decimal GbUp { get;set;}
+        
+
     }
 
 }

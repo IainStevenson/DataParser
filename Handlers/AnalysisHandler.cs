@@ -21,10 +21,13 @@ namespace DataParser
                     Timestamp = data.Timestamp,
                     ExternalIp = data.Interface.ExternalIp,
                     BandwidthDown = data.Download.Bandwidth,
+                    BytesDown = data.Download.Bytes,
                     BandwidthUp = data.Upload.Bandwidth,
+                    BytesUp = data.Upload.Bytes,
                     Jitter = data.Ping.Jitter,
                     Latency = data.Ping.Latency,
-                    ISP = data.Isp
+                    ISP = data.Isp,
+                    
                 };
 
                 var itemDate = DateTime.Parse(summary.Timestamp.ToLongDateString());
