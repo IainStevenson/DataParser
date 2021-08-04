@@ -8,6 +8,7 @@ namespace DataParser
 
     public class ReportHandlerByHistogram : IReportHandler
     {
+        public static decimal BytesPerSecondToBitsPerSecond = 125000m;
         public ReportTypes ReportType { get; } = ReportTypes.Histogram;
         public StringBuilder Report(Analysis analysis)
         {
@@ -28,8 +29,8 @@ namespace DataParser
                 {
                     var reportItem = new ReportByHistogram();
                     reportItem.Timestamp = data.Timestamp;
-                    reportItem.Down = data.BandwidthDown / 125000m;
-                    reportItem.Up = data.BandwidthUp / 125000m;
+                    reportItem.Down = data.BandwidthDown / BytesPerSecondToBitsPerSecond;
+                    reportItem.Up = data.BandwidthUp / BytesPerSecondToBitsPerSecond;
                     reportItem.ISP = data.ISP;
                     reportItem.Jitter = data.Jitter;
                     reportItem.Latency = data.Latency;
@@ -43,7 +44,7 @@ namespace DataParser
 
 
             response.Append($"\nAnalysis Report: ");
-            response.Append($"\n\nTotals: Min Down {analysis.Totals.MinDown / 125000m,-6:00.00} Max Down {analysis.Totals.MaxDown / 125000m,-6:00.00} Min Up {analysis.Totals.MinUp / 125000m,-6:00.00} Max Up {analysis.Totals.MaxUp / 125000m,-6:00.00}\n");
+            response.Append($"\n\nTotals: Min Down {analysis.Totals.MinDown / BytesPerSecondToBitsPerSecond,-6:00.00} Max Down {analysis.Totals.MaxDown / BytesPerSecondToBitsPerSecond,-6:00.00} Min Up {analysis.Totals.MinUp / 125000m,-6:00.00} Max Up {analysis.Totals.MaxUp / 125000m,-6:00.00}\n");
 
             report.Append($"\n{"Time",-21}\t");
             report.Append($"{"Down",-6}\t");

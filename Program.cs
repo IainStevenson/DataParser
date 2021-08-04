@@ -19,7 +19,11 @@ namespace DataParser
             var fileHandler = new FileHandler();
             var datasourceHandler = new DataSourceHandler();
 
-            var sourceDirectory = new DirectoryInfo(argumentsHandler.GetSourceDirectory(args, $@"..\Data"));
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var defaultFolder = $@"{appData}\Ookla\Data";
+
+
+            var sourceDirectory = new DirectoryInfo(argumentsHandler.GetSourceDirectory(args, defaultFolder));
             var filePattern = argumentsHandler.GetFilePattern(args, "*.json");
             var datasourceFile = argumentsHandler.GetAnalysisFile(args, "datasource.json");
             var reportFile = argumentsHandler.GetReportFile(args, "analysis.txt");
