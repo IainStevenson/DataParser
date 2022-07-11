@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Text;
 
 namespace DataParser
 {
@@ -15,63 +15,41 @@ namespace DataParser
                 { ReportTypes.DateAndIP, new ReportHandlerByDateAndIP()},
                 { ReportTypes.Histogram, new ReportHandlerByHistogram()}
             };
-            var argumentsHandler = new ArgumentsHandler();
-            var fileHandler = new FileHandler();
-            var datasourceHandler = new DataSourceHandler();
-
-            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            var defaultFolder = $@"{appData}\Ookla\Data";
-
-
-            var sourceDirectory = new DirectoryInfo(argumentsHandler.GetSourceDirectory(args, defaultFolder));
-            var filePattern = argumentsHandler.GetFilePattern(args, "*.json");
-            var datasourceFile = argumentsHandler.GetAnalysisFile(args, "datasource.json");
-            var reportFile = argumentsHandler.GetReportFile(args, "analysis.txt");
-            var reportType = argumentsHandler.GetReportType(args, ReportTypes.DateAndIP);
 
             try
             {
+                var argumentsHandler = new ArgumentsHandler();
 
+                var appDataFolder = Environment.GetEnvironmentVariable("AppData");
+                var sourceDirectory = argumentsHandler.GetSourceDirectory(args, @$"{appDataFolder}\ookla\Data");
+                var filePattern = argumentsHandler.GetFilePattern(args, "*.json");
+                var analysisFile = argumentsHandler.GetAnalysisFile(args, "analysis.json");
+                var reportFile = argumentsHandler.GetReportFile(args, "analysis.txt");
+                var reportType = argumentsHandler.GetReportType(args, ReportTypes.DateAndIP);
 
-                var files = fileHandler.FindFileNames(sourceDirectory, filePattern);
-                Console.WriteLine($"Discovered {files.Count} files in total.");
+                // perform the required analysis of the data files
+                var analysis = new AnalysisHandler().Analyse(sourceDirectory, filePattern, analysisFile);
 
-                Console.WriteLine($"Loading previous data... ");
-                var datasource = datasourceHandler.Load(datasourceFile);
-                Console.WriteLine($"{datasource.Files.Count} files arlready loaded. ");
-                
-                var newFilesCount = files.Except(datasource.Files).Count();
-                Console.WriteLine($"Discovered {newFilesCount} new files found.");
-
-
-                if (newFilesCount > 0)
-                {
-                    Console.WriteLine($"Capturing new data ... ");
-                    datasource = new DataCaptureHandler().Capture(datasource, sourceDirectory, files);
-                    Console.WriteLine($"Saving new data ... ");
-                    datasourceHandler.Save(datasource, datasourceFile);
-                    Console.WriteLine($"Data     has been written to {new System.IO.FileInfo(datasourceFile).FullName}");
-                }
-
-                Console.WriteLine($"Analysing data ... ");                    
-                var analysis = new AnalysisHandler().Analyse(datasource);
-
-                Console.WriteLine($"Generating requested Report {reportType}... ");                    
+                // genreate the required report type
                 var report = new ReportHandler(reportHandlers).Report(analysis, reportType);
 
-                var reportFilename = fileHandler.SaveReport(reportFile, reportType, report);
-                Console.WriteLine($"Report   has been written to {new System.IO.FileInfo(reportFilename.ToString()).FullName}");
+                // save the output (overwrite previous as its cumulative (at the moment))
+                var file = new FileInfo(reportFile);
+                var reportFilename = new StringBuilder(file.Name);
+                reportFilename.Replace(file.Extension, $"-{reportType}{file.Extension}");                
+                System.IO.File.WriteAllText(reportFilename.ToString(), report.ToString());
 
                 // send to output
                 Console.WriteLine(report);
 
                 // advise of files
-                
+                Console.WriteLine($"Analysis has been written to {new System.IO.FileInfo(analysisFile).FullName}");
+                Console.WriteLine($"Report   has been written to {new System.IO.FileInfo(reportFilename.ToString()).FullName}");
 
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception encountered: {ex.Message}");
+                Console.WriteLine($"{ex.Message}");
             }
         }
     }

@@ -1,54 +1,89 @@
 using System;
+using System.IO;
+using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DataParser
 {
-
-    /// <summary>
-    /// Summaries the data
-    /// </summary>
-    public class AnalysisHandler
+    public  class AnalysisHandler
     {
-        public Analysis Analyse(DataSource datasource)
+
+       
+
+        public  Analysis Analyse(string sourceDirectory, string filePattern, string analysisFile)
         {
-
-            var response = new Analysis();
-
-            foreach (var data in datasource.Items)
+            var files = Directory.EnumerateFiles(sourceDirectory, filePattern, SearchOption.AllDirectories);
+            Console.WriteLine($"Discovered {files.Count()} files in total.");
+            Analysis analysis = new Analysis();
+            Console.WriteLine($"Analysing data ... ");
+            if (File.Exists(analysisFile))
             {
-                var summary = new Summary()
-                {
-                    Timestamp = data.Timestamp,
-                    ExternalIp = data.Interface.ExternalIp,
-                    BandwidthDown = data.Download.Bandwidth,
-                    BytesDown = data.Download.Bytes,
-                    BandwidthUp = data.Upload.Bandwidth,
-                    BytesUp = data.Upload.Bytes,
-                    Jitter = data.Ping.Jitter,
-                    Latency = data.Ping.Latency,
-                    ISP = data.Isp,
-                    
-                };
-
-                var itemDate = DateTime.Parse(summary.Timestamp.ToLongDateString());
-
-                var index = $"{itemDate}\t{summary.ExternalIp}";
-
-                if (response.Summaries.ContainsKey(index))
-                {
-                    response.Summaries[index].Add(summary);
-                }
-                else
-                {
-                    response.Summaries.Add(index, new List<Summary>() { summary });
-                }
-                response.Totals.MinDown = Math.Min(response.Totals.MinDown, summary.BandwidthDown);
-                response.Totals.MaxDown = Math.Max(response.Totals.MaxDown, summary.BandwidthDown);
-                response.Totals.MinUp = Math.Min(response.Totals.MinUp, summary.BandwidthUp);
-                response.Totals.MaxUp = Math.Max(response.Totals.MaxUp, summary.BandwidthUp);
-
+                Console.WriteLine($"Loading previous analysis... ");
+                var analysisData = File.ReadAllText(analysisFile);
+                analysis = JsonConvert.DeserializeObject<Analysis>(analysisData);
             }
-            return response;
+            if (files.Except(analysis.Files).Count() > 0)
+            {
+                var newFiles = files.Except(analysis.Files);
+                Console.WriteLine($"Processing {newFiles.Count()} new files... ");
+                
+                foreach (var file in newFiles)
+                {
+                    Console.Write(".");
+                    var textData = File.ReadAllText(file);
+
+                    if (!string.IsNullOrWhiteSpace(textData))
+                    {
+                        try
+                        {
+                            var data = JsonConvert.DeserializeObject<Data>($"{textData}");
+                            if (data.Interface != null)
+                            {
+                                var summary = new Summary()
+                                {
+                                    Timestamp = data.Timestamp,
+                                    ExternalIp = data.Interface.ExternalIp,
+                                    BandwidthDown = data.Download.Bandwidth,
+                                    BandwidthUp = data.Upload.Bandwidth,
+                                    Jitter = data.Ping.Jitter,
+                                    Latency = data.Ping.Latency,
+                                    ISP = data.Isp
+                                };
+                                var itemDate  = DateTime.Parse(summary.Timestamp.ToLongDateString());
+                                var index = $"{itemDate}\t{summary.ExternalIp}";
+                                if (analysis.Summaries.ContainsKey(index))
+                                {
+                                    // same IP
+                                    analysis.Summaries[index].Add(summary);
+                                }
+                                else
+                                {
+                                    // new IP
+                                    analysis.Summaries.Add(index, new List<Summary>() { { summary } });
+                                }                                
+                            }
+                            else
+                            {
+                                //Console.WriteLine($"{file} {data.Timestamp} was an error!");
+                            }
+                            analysis.Files.Add(file);                    
+                        }
+                        catch //(System.Exception ex)
+                        {
+                            //Console.WriteLine($"Could not read {file} {ex.Message}");
+                        }
+                    }
+                }
+                File.WriteAllText("analysis.json", JsonConvert.SerializeObject(analysis));
+            }
+            else
+            {
+                Console.WriteLine($"No new files to analyse... ");
+            }
+            Console.WriteLine();
+                    
+            return analysis;
         }
     }
 }

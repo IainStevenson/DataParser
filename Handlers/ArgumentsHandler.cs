@@ -129,8 +129,6 @@ namespace DataParser
         public ReportTypes GetReportType(string[] args, ReportTypes defaultValue)
         {
             var response = defaultValue;
-            Console.WriteLine($"{args.Length} arguments specified.");
-            
             if (args.Length > 0)
             {
                 var arg = args.FirstOrDefault(x => x.StartsWith("--reportBy=", StringComparison.InvariantCultureIgnoreCase)
@@ -149,13 +147,11 @@ namespace DataParser
                             break;
                         default:
                         response = defaultValue;
-                            
                         break;
                     }
-                    Console.WriteLine($"A {response} report was requested.");
-                    return response;            
                 }
             }
+
             return response;
         }
     }
