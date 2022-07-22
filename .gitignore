@@ -344,3 +344,4 @@ healthchecksdb
 /src/Proxy/certificates
 old-analysis.json
 datasource.json
+analysis.json
