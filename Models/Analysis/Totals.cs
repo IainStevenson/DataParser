@@ -1,4 +1,4 @@
-namespace DataParser
+namespace DataParser.Models.Analysis
 {
     public class Totals
     {

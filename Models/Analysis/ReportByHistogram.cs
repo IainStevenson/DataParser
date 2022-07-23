@@ -1,6 +1,6 @@
 using System;
 
-namespace DataParser
+namespace DataParser.Models.Analysis
 {
     public class ReportByHistogram : DataHistogramStatstics
     {

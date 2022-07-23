@@ -1,4 +1,4 @@
-﻿namespace DataParser
+﻿namespace DataParser.Models.Capture
 {
     public class Upload
     {

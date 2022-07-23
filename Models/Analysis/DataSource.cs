@@ -1,6 +1,6 @@
 using DataParser.Models.Capture;
 using System.Collections.Generic;
-namespace DataParser
+namespace DataParser.Models.Analysis
 {
     public class DataSource
     {
@@ -15,7 +15,7 @@ namespace DataParser
         /// Collection of data items
         /// </summary>
         /// <returns></returns>
-        public List<Data> Items { get; set; } = new List< Data>();
+        public List<Data> Items { get; set; } = new List<Data>();
 
     }
 }

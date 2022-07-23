@@ -1,4 +1,5 @@
 using System.IO;
+using DataParser.Models.Analysis;
 using Newtonsoft.Json;
 
 namespace DataParser
