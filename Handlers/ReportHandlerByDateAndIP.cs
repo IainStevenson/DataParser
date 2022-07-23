@@ -67,10 +67,10 @@ namespace DataParser
             report.Append($"\n                                                                                Mbit/s");
             response.Append(report);
             report.Clear();
-            report.Append($"\n                                                                                Down                                    Up                                ");
+            report.Append($"\n                                                                                Down                                            Up                                         ");
             response.Append(report);
             report.Clear();
-            report.Append($"\n                                                                                ------------------------------------------    --------------------------------------------");
+            report.Append($"\n                                                                                ---------------------------------------------   --------------------------------------------");
             response.Append(report);
             report.Clear();
             report.Append($"\n{"Date",-12}\t{"Address",-15}\t{"From",-22}\t{"To",-22}\t");
@@ -79,7 +79,7 @@ namespace DataParser
             report.Append($"Entries");
             response.Append(report);
             report.Clear();
-            report.Append($"\n--------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            report.Append($"\n--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
             response.Append(report);
 
             foreach (var reportItem in reportItems.OrderBy(x => x.To))
