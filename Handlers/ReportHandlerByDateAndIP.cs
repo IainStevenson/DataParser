@@ -14,8 +14,27 @@ namespace DataParser
         public StringBuilder Report(Analysis analysis)
         {
             StringBuilder response = new StringBuilder();
-            var reportItems = new List<ReportByDateAndIP>();
+            
+            List<ReportByDateAndIP> reportItems = GetReportDataItems(analysis);
 
+            
+            StringBuilder report = new StringBuilder();
+            
+            AddReportHeader(report, response, analysis);
+
+            foreach (var reportItem in reportItems.OrderBy(x => x.To))
+            {
+                AddReportLine(report, reportItem);
+                response.Append(report);
+                report.Clear();
+            }
+
+            return response;
+        }
+
+        private List<ReportByDateAndIP> GetReportDataItems(Analysis analysis)
+        {
+            var response = new List<ReportByDateAndIP>();
             foreach (var index in analysis.Summaries.Keys.OrderBy(x => x))
             {
                 var reportItem = new ReportByDateAndIP();
@@ -31,7 +50,6 @@ namespace DataParser
                 reportItem.Entries = summary.Count;
                 reportItem.From = summary.Min(x => x.Timestamp);
                 reportItem.To = summary.Max(x => x.Timestamp);
-
                 var thisDaysSummaries = analysis.Summaries
                                                 .Where(x => x.Key.StartsWith($"{reportItem.Date}"))
                                                 .Select(y => y.Value)
@@ -39,26 +57,24 @@ namespace DataParser
                 var thisDaysItems = thisDaysSummaries.SelectMany(x => x).ToArray();
                 var thisDaysDownloadItems = thisDaysItems.Select(x => x.BandwidthDown).ToArray();
                 var thisDaysUploadItems = thisDaysItems.Select(x => x.BandwidthUp).ToArray();
-
-
                 SetStatistics(reportItem.Download,
                                         summary.Min(x => x.BandwidthDown),
                                         summary.Max(x => x.BandwidthDown),
                                         (summary.LastOrDefault()?.BandwidthDown ?? 1),
                                         thisDaysDownloadItems);
-
-
                 SetStatistics(reportItem.Upload,
                                         summary.Min(x => x.BandwidthUp),
                                         summary.Max(x => x.BandwidthUp),
                                         (summary.LastOrDefault()?.BandwidthUp ?? 1),
                                         thisDaysUploadItems);
-
-
-                reportItems.Add(reportItem);
-
+                response.Add(reportItem);
             }
+            return response;
 
+        }
+
+        private void AddReportHeader(StringBuilder report, StringBuilder response, Analysis analysis)
+        {
             var reportTitle = $"\nBy Date and IP Address Analysis Report:";
 
             response.Append($"\nFound {analysis.Files.Count()} distinct files");
@@ -68,57 +84,51 @@ namespace DataParser
             var fullUnderLine = $"\n{dataSectionUnderline}{dataSectionUnderline}{dataSectionUnderline}{dataSectionUnderline}--";
             var contextDescription = $"\n{"Date",-12}\t{"Address",-15}\t{"From",-22}\t{"To",-22}\t";
             var dataSectionDesrciption = $"Min   \t25th  \t50th  \t75th  \tMax   \tLast\t";
-            StringBuilder report = new StringBuilder();
+            
             report.Append(reportTitle);
             report.Append($"{newLineSpacer}Mbit/s");
-            
+
             response.Append(report);
-            
+
             report.Clear();
-            
+
             report.Append($"{newLineSpacer}Down                                            Up                                         ");
-            
+
             response.Append(report);
             report.Clear();
-            
+
             report.Append($"{newLineSpacer}{dataSectionUnderline}{dataSectionUnderline}");
             response.Append(report);
             report.Clear();
-            
+
             report.Append($"{contextDescription}{dataSectionDesrciption}{dataSectionDesrciption}Tests");
             response.Append(report);
             report.Clear();
-            
+
             report.Append(fullUnderLine);
             response.Append(report);
+            report.Clear();
+        }
 
-            foreach (var reportItem in reportItems.OrderBy(x => x.To))
-            {
-                report.Clear();
-
-                report.Append($"\n{reportItem.Date,-12:yyyy-MM-dd}\t");
-                report.Append($"{reportItem.ExternalIp,-15}\t");
-                report.Append($"{reportItem.From,-22:yyyy-MM-dd HH:mm:ss}\t");
-                report.Append($"{reportItem.To,-22:yyyy-MM-dd HH:mm:ss}\t");
-                report.Append($"{reportItem.Download.Min,-6:00.00}\t");
-                report.Append($"{reportItem.Download.P25,-6:00.00}\t");
-                report.Append($"{reportItem.Download.P50,-6:00.00}\t");
-                report.Append($"{reportItem.Download.P75,-6:00.00}\t");
-                report.Append($"{reportItem.Download.Max,-6:00.00}\t");
-                report.Append($"{reportItem.Download.Last,-6:00.00}\t");
-                report.Append($"{reportItem.Upload.Min,-6:00.00}\t");
-                report.Append($"{reportItem.Upload.P25,-6:00.00}\t");
-                report.Append($"{reportItem.Upload.P50,-6:00.00}\t");
-                report.Append($"{reportItem.Upload.P75,-6:00.00}\t");
-                report.Append($"{reportItem.Upload.Max,-6:00.00}\t");
-                report.Append($"{reportItem.Upload.Last,-6:00.00}\t");
-                report.Append($"{reportItem.Entries,6:000}");
-
-                response.Append(report);
-
-            }
-
-            return response;
+        private void AddReportLine(StringBuilder report, ReportByDateAndIP reportItem)
+        {
+            report.Append($"\n{reportItem.Date,-12:yyyy-MM-dd}\t");
+            report.Append($"{reportItem.ExternalIp,-15}\t");
+            report.Append($"{reportItem.From,-22:yyyy-MM-dd HH:mm:ss}\t");
+            report.Append($"{reportItem.To,-22:yyyy-MM-dd HH:mm:ss}\t");
+            report.Append($"{reportItem.Download.Min,-6:00.00}\t");
+            report.Append($"{reportItem.Download.P25,-6:00.00}\t");
+            report.Append($"{reportItem.Download.P50,-6:00.00}\t");
+            report.Append($"{reportItem.Download.P75,-6:00.00}\t");
+            report.Append($"{reportItem.Download.Max,-6:00.00}\t");
+            report.Append($"{reportItem.Download.Last,-6:00.00}\t");
+            report.Append($"{reportItem.Upload.Min,-6:00.00}\t");
+            report.Append($"{reportItem.Upload.P25,-6:00.00}\t");
+            report.Append($"{reportItem.Upload.P50,-6:00.00}\t");
+            report.Append($"{reportItem.Upload.P75,-6:00.00}\t");
+            report.Append($"{reportItem.Upload.Max,-6:00.00}\t");
+            report.Append($"{reportItem.Upload.Last,-6:00.00}\t");
+            report.Append($"{reportItem.Entries,6:000}");
         }
 
         private void SetStatistics(Statistics stats, long min, long max, long last, long[] thisDaysStatItems)
