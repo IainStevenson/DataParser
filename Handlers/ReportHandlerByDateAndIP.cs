@@ -4,39 +4,11 @@ using System.Linq;
 using System.Text;
 
 namespace DataParser
-{
+{    
+
     public class ReportHandlerByDateAndIP : IReportHandler
     {
         public ReportTypes ReportType { get; } = ReportTypes.DateAndIP;
-
-
-        /// <summary>
-        /// From a sequence of numbers finds the nth percentile value using the nearest rank method.
-        /// <example>
-        /// var value = Percentile( [1,2,3,4,5,6,7,8,9,10], 90) 
-        /// returns value of 9
-        /// <\example>
-        /// </summary>
-        public double Percentile(long[] sequence, int  percentile)
-        {
-            if (percentile > 100) percentile = 100;
-            if (percentile < 1 ) percentile = 1;
-
-            Array.Sort(sequence);
-            
-            int N = sequence.Length;
-           
-            decimal realIndex = (percentile /100m) * (sequence.Length-1);
-            int index=(int)realIndex;
-            
-            return (double)sequence[index];
-
-            // if(index+1<elements.Length)
-            //     return (double)(elements[index]*(1-frac)+elements[index+1]*frac);
-            // else
-            //     
-        }
-
 
         public StringBuilder Report(Analysis analysis)
         {
@@ -69,10 +41,9 @@ namespace DataParser
                             .Where( x=> x.Key.StartsWith( $"{reportItem.Date}" )).Select(y=>y.Value).ToList();
 
                 var thisDaysItems = thisDaysSummaries.SelectMany(x => x ).ToArray();
-                // long[] thisdaysdown = thisDaysSummaries.Select(x => x.BandwidthDown).ToArray();
-
-                var n95Up = Math.Floor(this.Percentile(thisDaysItems.Select(x=>x.BandwidthUp).ToArray(), 95)) ;
-                var n95Down = Math.Floor(this.Percentile(thisDaysItems.Select(x=>x.BandwidthDown).ToArray(), 95)) ;
+                
+                var n95Up = Math.Floor(thisDaysItems.Select(x=>x.BandwidthUp).ToArray().Percentile( 95)) ;
+                var n95Down = Math.Floor(thisDaysItems.Select(x=>x.BandwidthDown).ToArray().Percentile( 95)) ;
 
                 reportItem.N95Up = (double) (n95Up / 125000);
                 reportItem.MaxDown = summary.Max(x => x.BandwidthDown) / 125000m;
