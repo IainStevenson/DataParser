@@ -345,3 +345,5 @@ healthchecksdb
 old-analysis.json
 datasource.json
 analysis.json
+analysis.json
+analysis-keep.json
