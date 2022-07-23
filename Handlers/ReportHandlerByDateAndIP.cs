@@ -59,27 +59,37 @@ namespace DataParser
 
             }
 
-            response.Append($"\nAnalysis Report: ");
+            var reportTitle = $"\nBy Date and IP Address Analysis Report:";
+
             response.Append($"\nFound {analysis.Files.Count()} distinct files");
             response.Append($"\nFound {analysis.Summaries.Keys.Count()} distinct ip addresses");
-
+            var newLineSpacer = $"\n                                                                                ";
+            var dataSectionUnderline = "---------------------------------------------";
+            var fullUnderLine = $"\n{dataSectionUnderline}{dataSectionUnderline}{dataSectionUnderline}{dataSectionUnderline}--";
+            var contextDescription = $"\n{"Date",-12}\t{"Address",-15}\t{"From",-22}\t{"To",-22}\t";
+            var dataSectionDesrciption = $"Min   \t25th  \t50th  \t75th  \tMax   \tLast\t";
             StringBuilder report = new StringBuilder();
-            report.Append($"\n                                                                                Mbit/s");
+            report.Append(reportTitle);
+            report.Append($"{newLineSpacer}Mbit/s");
+            
+            response.Append(report);
+            
+            report.Clear();
+            
+            report.Append($"{newLineSpacer}Down                                            Up                                         ");
+            
             response.Append(report);
             report.Clear();
-            report.Append($"\n                                                                                Down                                            Up                                         ");
+            
+            report.Append($"{newLineSpacer}{dataSectionUnderline}{dataSectionUnderline}");
             response.Append(report);
             report.Clear();
-            report.Append($"\n                                                                                ---------------------------------------------   --------------------------------------------");
+            
+            report.Append($"{contextDescription}{dataSectionDesrciption}{dataSectionDesrciption}Tests");
             response.Append(report);
             report.Clear();
-            report.Append($"\n{"Date",-12}\t{"Address",-15}\t{"From",-22}\t{"To",-22}\t");
-            report.Append($"Min   \t25th  \t50th  \t75th  \tMax   \tLast\t");
-            report.Append($"Min   \t25th  \t50th  \t75th  \tMax   \tLast\t");
-            report.Append($"Entries");
-            response.Append(report);
-            report.Clear();
-            report.Append($"\n--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            
+            report.Append(fullUnderLine);
             response.Append(report);
 
             foreach (var reportItem in reportItems.OrderBy(x => x.To))
