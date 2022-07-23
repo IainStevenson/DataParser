@@ -3,6 +3,7 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Linq;
 using System.Collections.Generic;
+using DataParser.Models.Capture;
 
 namespace DataParser
 {

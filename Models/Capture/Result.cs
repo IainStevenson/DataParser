@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DataParser
+namespace DataParser.Models.Capture
 {
     public class Result
     {

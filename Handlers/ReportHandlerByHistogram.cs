@@ -1,3 +1,4 @@
+using DataParser.Models.Analysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;

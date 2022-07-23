@@ -1,3 +1,4 @@
+using DataParser.Models.Capture;
 using System.Collections.Generic;
 namespace DataParser
 {

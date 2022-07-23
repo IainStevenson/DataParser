@@ -1,3 +1,4 @@
+using DataParser.Models.Analysis;
 using System.Text;
 
 namespace DataParser

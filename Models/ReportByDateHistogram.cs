@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 
 namespace DataParser
 {
-    public class ReportByHistogram : DataHistogramStatstics
+    public class ReportByDateHistogram : DataHistogramStatstics
     {
         public DateTime Timestamp { get; set; }
         public string ISP { get; set; }

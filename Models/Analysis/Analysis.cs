@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DataParser
+namespace DataParser.Models.Analysis
 {
     public class Analysis
     {

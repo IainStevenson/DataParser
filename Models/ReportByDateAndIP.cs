@@ -2,7 +2,7 @@ using System;
 
 namespace DataParser
 {
-    public class ReportByDateAndIP: DataStatistics
+    public class ReportByDateAndIP : DataStatistics
     {
         public string ExternalIp { get; set; }
         public DateTime From { get; set; }
