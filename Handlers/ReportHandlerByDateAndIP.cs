@@ -28,44 +28,32 @@ namespace DataParser
 
                 reportItem.Date = date;
                 reportItem.ExternalIp = address;
-
                 reportItem.Entries = summary.Count;
-
                 reportItem.From = summary.Min(x => x.Timestamp);
                 reportItem.To = summary.Max(x => x.Timestamp);
 
-
-                reportItem.MinDown = summary.Min(x => x.BandwidthDown) / 125000m;
-                reportItem.AvgDown = summary.Average(x => x.BandwidthDown) / 125000;
-
                 var thisDaysSummaries = analysis.Summaries
-                            .Where( x=> x.Key.StartsWith( $"{reportItem.Date}" )).Select(y=>y.Value).ToList();
-
-                var thisDaysItems = thisDaysSummaries.SelectMany(x => x ).ToArray();
-                
-                var n95Up = Math.Floor(thisDaysItems.Select(x=>x.BandwidthUp).ToArray().Percentile( 95)) ;
-                var n95Down = Math.Floor(thisDaysItems.Select(x=>x.BandwidthDown).ToArray().Percentile( 95)) ;
-
-                //reportItem.N95Up = (double) (n95Up / 125000);
+                                                .Where(x => x.Key.StartsWith($"{reportItem.Date}"))
+                                                .Select(y => y.Value)
+                                                .ToList();
+                var thisDaysItems = thisDaysSummaries.SelectMany(x => x).ToArray();
+                var thisDaysDownloadItems = thisDaysItems.Select(x => x.BandwidthDown).ToArray();
+                var thisDaysUploadItems = thisDaysItems.Select(x => x.BandwidthUp).ToArray();
 
 
-                reportItem.P25Up = Math.Floor(thisDaysItems.Select(x => x.BandwidthUp).ToArray().Percentile(25));
-                reportItem.P50Up = Math.Floor(thisDaysItems.Select(x => x.BandwidthUp).ToArray().Percentile(50));
-                reportItem.P75Up = Math.Floor(thisDaysItems.Select(x => x.BandwidthUp).ToArray().Percentile(55));
+                SetStatistics(reportItem.Download,
+                                        summary.Min(x => x.BandwidthDown),
+                                        summary.Max(x => x.BandwidthDown),
+                                        (summary.LastOrDefault()?.BandwidthDown ?? 1),
+                                        thisDaysDownloadItems);
 
 
-                reportItem.MaxDown = summary.Max(x => x.BandwidthDown) / 125000m;
-                reportItem.MinUp = summary.Min(x => x.BandwidthUp) / 125000m;
-                reportItem.AvgUp = summary.Average(x => x.BandwidthUp) / 125000;
-                reportItem.MaxUp = summary.Max(x => x.BandwidthUp) / 125000m;
-                //reportItem.N95Down = (double)(n95Down / 125000);
+                SetStatistics(reportItem.Upload,
+                                        summary.Min(x => x.BandwidthUp),
+                                        summary.Max(x => x.BandwidthUp),
+                                        (summary.LastOrDefault()?.BandwidthUp ?? 1),
+                                        thisDaysUploadItems);
 
-                reportItem.P25Down = Math.Floor(thisDaysItems.Select(x => x.BandwidthDown).ToArray().Percentile(25));
-                reportItem.P50Down = Math.Floor(thisDaysItems.Select(x => x.BandwidthDown).ToArray().Percentile(50));
-                reportItem.P75Down = Math.Floor(thisDaysItems.Select(x => x.BandwidthDown).ToArray().Percentile(75));
-
-                reportItem.LastUp = (summary.LastOrDefault()?.BandwidthUp ?? 1) / 125000m;
-                reportItem.LastDown = (summary.LastOrDefault()?.BandwidthDown ?? 1) / 125000m;
 
                 reportItems.Add(reportItem);
 
@@ -98,24 +86,23 @@ namespace DataParser
             {
                 report.Clear();
 
-                report.Append($"\n{ reportItem.Date,-12:yyyy-MM-dd}\t");
-                report.Append($"{ reportItem.ExternalIp,-15}\t");
-                report.Append($"{ reportItem.From,-22:yyyy-MM-dd HH:mm:ss}\t");
-                report.Append($"{ reportItem.To,-22:yyyy-MM-dd HH:mm:ss}\t");
-                report.Append($"{ reportItem.MinDown,-6:00.00}\t");
-                report.Append($"{reportItem.P25Down,-6:00.00}\t");
-                report.Append($"{reportItem.P50Down,-6:00.00}\t");
-                report.Append($"{reportItem.P75Down,-6:00.00}\t");
-                report.Append($"{ reportItem.MaxDown,-6:00.00}\t");
-                report.Append($"{ reportItem.LastDown,-6:00.00}\t");
-                report.Append($"{ reportItem.MinUp,-6:00.00}\t");
-                report.Append($"{ reportItem.AvgUp,-6:00.00}\t");
-                report.Append($"{reportItem.P25Up,-6:00.00}\t");
-                report.Append($"{reportItem.P50Up,-6:00.00}\t");
-                report.Append($"{reportItem.P75Up,-6:00.00}\t");
-                report.Append($"{ reportItem.MaxUp,-6:00.00}\t");
-                report.Append($"{ reportItem.LastUp,-6:00.00}\t");
-                report.Append($"{ reportItem.Entries,6:000}");
+                report.Append($"\n{reportItem.Date,-12:yyyy-MM-dd}\t");
+                report.Append($"{reportItem.ExternalIp,-15}\t");
+                report.Append($"{reportItem.From,-22:yyyy-MM-dd HH:mm:ss}\t");
+                report.Append($"{reportItem.To,-22:yyyy-MM-dd HH:mm:ss}\t");
+                report.Append($"{reportItem.Download.Min,-6:00.00}\t");
+                report.Append($"{reportItem.Download.P25,-6:00.00}\t");
+                report.Append($"{reportItem.Download.P50,-6:00.00}\t");
+                report.Append($"{reportItem.Download.P75,-6:00.00}\t");
+                report.Append($"{reportItem.Download.Max,-6:00.00}\t");
+                report.Append($"{reportItem.Download.Last,-6:00.00}\t");
+                report.Append($"{reportItem.Upload.Min,-6:00.00}\t");
+                report.Append($"{reportItem.Upload.P25,-6:00.00}\t");
+                report.Append($"{reportItem.Upload.P50,-6:00.00}\t");
+                report.Append($"{reportItem.Upload.P75,-6:00.00}\t");
+                report.Append($"{reportItem.Upload.Max,-6:00.00}\t");
+                report.Append($"{reportItem.Upload.Last,-6:00.00}\t");
+                report.Append($"{reportItem.Entries,6:000}");
 
                 response.Append(report);
 
@@ -124,5 +111,14 @@ namespace DataParser
             return response;
         }
 
+        private void SetStatistics(Statistics stats, long min, long max, long last, long[] thisDaysStatItems)
+        {
+            stats.Min = min / 125000m;
+            stats.P25 = ((decimal)Math.Floor(thisDaysStatItems.Percentile(25))) / 125000m;
+            stats.P50 = ((decimal)Math.Floor(thisDaysStatItems.Percentile(50))) / 125000m;
+            stats.P75 = ((decimal)Math.Floor(thisDaysStatItems.Percentile(55))) / 125000m;
+            stats.Max = max / 125000m;
+            stats.Last = last / 125000m;
+        }
     }
 }
